@@ -7,8 +7,6 @@ interface BottomNavDockProps {
   setLang: (lang: 'my' | 'en') => void;
   handleAdminLinkClick: (url: string) => void;
   t: any;
-  SHEET_URL: string;
-  DRIVE_FOLDER_URL: string;
 }
 
 const BottomNavDock: React.FC<BottomNavDockProps> = ({
@@ -17,9 +15,7 @@ const BottomNavDock: React.FC<BottomNavDockProps> = ({
   lang,
   setLang,
   handleAdminLinkClick,
-  t,
-  SHEET_URL,
-  DRIVE_FOLDER_URL
+  t
 }) => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
@@ -77,26 +73,6 @@ const BottomNavDock: React.FC<BottomNavDockProps> = ({
             </span>
           </div>
           <span className="text-[8px] font-bold text-white/60 uppercase tracking-tighter">Language</span>
-        </button>
-
-        <button 
-          onClick={() => handleAdminLinkClick(SHEET_URL)} 
-          className="flex-1 bg-white/5 hover:bg-white/10 p-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all active:scale-90 border border-white/10"
-          title={t.googleSheet}
-          aria-label={t.googleSheet}
-        >
-          <svg className="w-5 h-5 text-white/80" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2zM19 19H5V4h8v4h4v11zM7 10h10v2H7v-2zm0 4h10v2H7v-2z"/></svg>
-          <span className="text-[8px] font-bold text-white/60 uppercase tracking-tighter">Sheet</span>
-        </button>
-
-        <button 
-          onClick={() => handleAdminLinkClick(DRIVE_FOLDER_URL)} 
-          className="flex-1 bg-[#B8860B] hover:bg-[#9a700a] p-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all active:scale-95 border border-[#FCF6BA]/30 shadow-lg"
-          title={t.fullLibrary}
-          aria-label={t.fullLibrary}
-        >
-          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-          <span className="text-[8px] font-bold text-white uppercase tracking-tighter">Library</span>
         </button>
       </div>
     </nav>

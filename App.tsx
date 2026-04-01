@@ -1,14 +1,18 @@
 
+import PocketBase from 'pocketbase';
 import React, { useState, useEffect, Suspense, lazy, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AudioGuide } from './types';
-import { meditationItems, getDriveUrl, getDownloadUrl } from './data/meditationData';
+import { meditationItems } from './data/meditationData';
 import logoUrl from './public/icon.svg';
 import AudioCard from './components/AudioCard';
 import BottomNavDock from './components/BottomNavDock';
 import AudioListContainer from './components/AudioListContainer';
 import UpNextCard from './components/UpNextCard';
 import StickyMiniPlayer from './components/StickyMiniPlayer';
+
+// Initialize PocketBase
+const pb = new PocketBase('https://api.mindset-it.online');
 
 // Lazy load non-critical components
 const ExplanationModal = lazy(() => import('./components/ExplanationModal'));
@@ -17,20 +21,10 @@ const AdminPinModal = lazy(() => import('./components/AdminPinModal'));
 
 /**
  * AUDIO LINK SYSTEM
- * The app now automatically fetches links from your Google Sheet!
- * Sheet: https://docs.google.com/spreadsheets/d/14y9p-Z35NCNWlgOiiBY39epO9M44cESG7mlVwEJcAYM/edit?usp=sharing
- * 
- * To add more days:
- * 1. Add a new row to the Google Sheet.
- * 2. Column B should be "Day X".
- * 3. Column D should be the Myanmar description/filename.
- * 4. Column E should be the Google Drive Share Link.
+ * The app now automatically fetches links from your PocketBase backend!
  */
 const STORAGE_KEY = 'mindful_project_v3';
 const LANG_KEY = 'mindfulness_lang_pref';
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/14y9p-Z35NCNWlgOiiBY39epO9M44cESG7mlVwEJcAYM/edit?usp=sharing";
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/14y9p-Z35NCNWlgOiiBY39epO9M44cESG7mlVwEJcAYM/export?format=csv";
-const DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/19MedBT6RlbzVxyU5OM8Ec3-5uod0eJno?usp=sharing";
 const PATRON_WEBSITE_URL = "https://drsoelwin.mindset-it.online/";
 const AUDIO_SUMMARY_URL = "https://dhamma-mindset.pages.dev/";
 const NOTEBOOK_LM_URL = "https://notebooklm.google.com/notebook/5c693072-7f7a-40a2-84da-8060c1213a8d";
@@ -87,72 +81,35 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const fetchSheetData = async () => {
+    const fetchPocketbaseData = async () => {
       try {
-        const response = await fetch(SHEET_CSV_URL);
-        const csvText = await response.text();
-        const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '').slice(1); // Skip header and empty lines
-        
-        const links: Record<number, { id: string, fileName: string, shareLink: string, date?: string, explanation?: string }> = {};
-        lines.forEach(line => {
-          // Robust CSV parsing (handling potential quotes and commas inside quotes)
-          const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-          
-          // Based on user's new sheet format: 
-          // Column A (parts[0]) = No.
-          // Column B (parts[1]) = Day Count (e.g., "Day 1")
-          // Column C (parts[2]) = Date (DD-MM-YYYY)
-          // Column D (parts[3]) = File Name (Myanmar Text)
-          // Column E (parts[4]) = Share Link
-          if (parts.length >= 5) {
-            const noText = parts[0].replace(/^"|"$/g, '').trim();
-            const dayText = parts[1].replace(/^"|"$/g, '').trim();
-            const date = parts[2].replace(/^"|"$/g, '').trim();
-            const fileName = parts[3].replace(/^"|"$/g, '').trim();
-            const shareLink = parts[4].replace(/[<>"\s]/g, '').replace(/^"|"$/g, '');
-            
-            // Extract Day Number from "Day X" or the "No." column
-            const dayMatch = dayText.match(/Day\s*(\d+)/i) || noText.match(/^(\d+)$/);
-            if (dayMatch) {
-              const dayNum = parseInt(dayMatch[1]);
-              const fileIdMatch = shareLink.match(/id=([^&]+)/) || shareLink.match(/\/d\/([^/]+)/);
-              
-              if (fileIdMatch) {
-                const fileId = fileIdMatch[1];
-                links[dayNum] = { 
-                  id: fileId, 
-                  fileName: fileName || dayText, // Use Myanmar filename if available
-                  shareLink, 
-                  date
-                };
-              }
-            }
-          }
+        const records = await pb.collection('meditations').getFullList({
+          sort: '+day_number',
         });
 
-        if (Object.keys(links).length > 0) {
+        if (records.length > 0) {
           setAudioGuides(prev => prev.map(guide => {
-            const sheetData = links[guide.id];
-            if (!sheetData) return guide;
+            const record = records.find(r => r.day_number === guide.id);
+            if (!record) return guide;
 
+            const url = pb.files.getUrl(record, record.audio_file);
             return {
               ...guide,
-              fileId: sheetData.id,
-              audioUrl: getDriveUrl(sheetData.id),
-              downloadUrl: getDownloadUrl(sheetData.id),
-              fileName: sheetData.fileName,
-              shareLink: sheetData.shareLink,
-              date: sheetData.date || guide.date,
-              explanation: sheetData.fileName // Using the Myanmar filename as explanation/title
+              fileName: record.title,
+              explanation: record.title,
+              date: record.date_string || guide.date,
+              audioUrl: url,
+              downloadUrl: url,
+              // isCompleted is preserved from prev state
             };
           }));
         }
       } catch (error) {
-        console.error("Error fetching sheet data:", error);
+        console.error("Error fetching PocketBase data:", error);
       }
     };
 
-    fetchSheetData();
+    fetchPocketbaseData();
   }, []);
 
   useEffect(() => {
@@ -223,8 +180,6 @@ const App: React.FC = () => {
   const listenNow = useCallback((guide: AudioGuide) => {
     if (guide.audioUrl) {
       window.open(guide.audioUrl, '_blank');
-    } else {
-      window.open(DRIVE_FOLDER_URL, '_blank');
     }
   }, []);
 
@@ -504,8 +459,6 @@ const App: React.FC = () => {
         setLang={setLang}
         handleAdminLinkClick={handleAdminLinkClick}
         t={t}
-        SHEET_URL={SHEET_URL}
-        DRIVE_FOLDER_URL={DRIVE_FOLDER_URL}
       />
 
       <footer className="mt-12 text-center pb-8 opacity-40 border-t border-gray-200 pt-8">
