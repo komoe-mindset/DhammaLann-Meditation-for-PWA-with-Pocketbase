@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { WifiOff } from 'lucide-react';
 
 const GlobalOfflineBanner: React.FC = () => {
@@ -21,7 +21,7 @@ const GlobalOfflineBanner: React.FC = () => {
   return (
     <AnimatePresence>
       {!isOnline && (
-        <motion.div
+        <m.div
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -100, opacity: 0 }}
@@ -31,14 +31,14 @@ const GlobalOfflineBanner: React.FC = () => {
             <div 
               role="alert"
               aria-live="assertive"
-              className="bg-red-500/90 backdrop-blur-md text-white text-[10px] px-4 py-2 rounded-full font-bold shadow-lg flex items-center gap-2 border border-red-400/50 pointer-events-auto"
+              className="bg-red-500/90 backdrop-blur-md text-white text-xs px-4 py-2 rounded-full font-bold shadow-lg flex items-center gap-2 border border-red-400/50 pointer-events-auto"
             >
               <WifiOff className="w-3 h-3 animate-pulse" />
               <span className="uppercase tracking-wider">Offline Mode</span>
               <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );
