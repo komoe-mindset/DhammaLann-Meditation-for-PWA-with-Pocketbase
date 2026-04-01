@@ -13,6 +13,7 @@ interface AudioListContainerProps {
     dayLabel: string;
   };
   lang: 'my' | 'en';
+  itemRefs: React.MutableRefObject<Map<number, HTMLDivElement | null>>;
 }
 
 const AudioListContainer: React.FC<AudioListContainerProps> = ({
@@ -21,7 +22,8 @@ const AudioListContainer: React.FC<AudioListContainerProps> = ({
   onToggleDone,
   firstUncompletedId,
   t,
-  lang
+  lang,
+  itemRefs
 }) => {
   // Helper to convert numbers to Myanmar digits
   const toMyanmarDigits = (num: number) => {
@@ -128,6 +130,10 @@ const AudioListContainer: React.FC<AudioListContainerProps> = ({
                       {monthItems.map((guide) => (
                         <AudioCard 
                           key={guide.id}
+                          ref={(el) => {
+                            if (el) itemRefs.current.set(guide.id, el);
+                            else itemRefs.current.delete(guide.id);
+                          }}
                           guide={guide}
                           onPlay={onPlay}
                           onToggleDone={onToggleDone}

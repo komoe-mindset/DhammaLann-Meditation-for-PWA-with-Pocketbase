@@ -1,6 +1,6 @@
 
 import PocketBase from 'pocketbase';
-import React, { useState, useEffect, Suspense, lazy, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, Suspense, lazy, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AudioGuide } from './types';
 import { meditationItems } from './data/meditationData';
@@ -10,6 +10,7 @@ import BottomNavDock from './components/BottomNavDock';
 import AudioListContainer from './components/AudioListContainer';
 import UpNextCard from './components/UpNextCard';
 import StickyMiniPlayer from './components/StickyMiniPlayer';
+import GlobalOfflineBanner from './components/GlobalOfflineBanner';
 
 // Initialize PocketBase
 const pb = new PocketBase('https://api.mindset-it.online');
@@ -37,6 +38,7 @@ const App: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedAudio, setSelectedAudio] = useState<AudioGuide | null>(null);
   const [currentlyPlayingAudio, setCurrentlyPlayingAudio] = useState<AudioGuide | null>(null);
+  const itemRefs = useRef<Map<number, HTMLDivElement | null>>(new Map());
   
   const [hasScrolled, setHasScrolled] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -47,6 +49,20 @@ const App: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   const todayDate = new Date().toISOString().split('T')[0];
+
+  const firstUncompletedId = useMemo(() => audioGuides.find(g => !g.isCompleted)?.id, [audioGuides]);
+  const nextAudio = useMemo(() => audioGuides.find(g => !g.isCompleted), [audioGuides]);
+  const currentStreak = useMemo(() => {
+    let streak = 0;
+    for (const guide of audioGuides) {
+      if (guide.isCompleted) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }, [audioGuides]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -109,22 +125,23 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!hasScrolled && audioGuides.length > 0) {
-      const firstUncompleted = audioGuides.findIndex(g => !g.isCompleted);
-      if (firstUncompleted > 0) {
-        setTimeout(() => {
-          const container = document.querySelector('.custom-scrollbar');
-          if (container) {
-            const buttons = container.querySelectorAll('button');
-            if (buttons[firstUncompleted]) {
-              buttons[firstUncompleted].scrollIntoView({ behavior: 'smooth', block: 'center' });
-              setHasScrolled(true);
-            }
+    if (!hasScrolled && audioGuides.length > 0 && firstUncompletedId) {
+      // Only scroll if it's not the first day to avoid unnecessary movement on fresh start
+      if (firstUncompletedId > 1) {
+        const timer = setTimeout(() => {
+          const element = itemRefs.current.get(firstUncompletedId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setHasScrolled(true);
           }
-        }, 500);
+        }, 600); // Slightly longer delay to ensure month expansion animation is well underway
+        return () => clearTimeout(timer);
+      } else {
+        // If it's the first day, we don't need to scroll, but we mark it as "scrolled" to prevent future checks
+        setHasScrolled(true);
       }
     }
-  }, [audioGuides]);
+  }, [audioGuides, firstUncompletedId, hasScrolled]);
 
   useEffect(() => {
     localStorage.setItem(LANG_KEY, lang);
@@ -228,20 +245,6 @@ const App: React.FC = () => {
     }
   }, [deferredPrompt]);
 
-  const firstUncompletedId = useMemo(() => audioGuides.find(g => !g.isCompleted)?.id, [audioGuides]);
-  const nextAudio = useMemo(() => audioGuides.find(g => !g.isCompleted), [audioGuides]);
-  const currentStreak = useMemo(() => {
-    let streak = 0;
-    for (const guide of audioGuides) {
-      if (guide.isCompleted) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-    return streak;
-  }, [audioGuides]);
-
   const animationProps = useMemo(() => {
     if (isMobile) return {
       initial: { opacity: 1, y: 0 },
@@ -257,6 +260,7 @@ const App: React.FC = () => {
 
   return (
     <main id="main-content" className={`max-w-2xl mx-auto px-4 py-4 md:py-12 relative pb-24 ${lang === 'my' ? 'lang-my' : ''}`}>
+      <GlobalOfflineBanner />
       <motion.header 
         className="text-center mb-6 md:mb-16 relative pt-4 md:pt-12"
         {...animationProps}
@@ -303,6 +307,7 @@ const App: React.FC = () => {
             firstUncompletedId={firstUncompletedId}
             t={t}
             lang={lang}
+            itemRefs={itemRefs}
           />
         </div>
       </motion.section>

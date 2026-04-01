@@ -17,33 +17,10 @@ const BottomNavDock: React.FC<BottomNavDockProps> = ({
   onOpenAdminDashboard,
   t,
 }) => {
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 z-[90] w-full max-w-md px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]" aria-label="Main Navigation">
       <div className="glass-card rounded-full p-2 border-2 border-[#D4AF37]/30 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-between gap-2 backdrop-blur-xl bg-black/40 relative">
         
-        {/* Offline Indicator */}
-        {!isOnline && (
-          <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-red-500/90 backdrop-blur-md text-white text-[10px] px-3 py-1.5 rounded-full font-bold shadow-lg animate-pulse flex items-center gap-1.5 border border-red-400/50 whitespace-nowrap">
-            <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
-            Offline Mode
-          </div>
-        )}
-
         {!isStandalone && (
           <button 
             onClick={handleInstallClick}
