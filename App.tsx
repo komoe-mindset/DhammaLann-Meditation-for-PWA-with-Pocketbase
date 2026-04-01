@@ -259,7 +259,12 @@ const App: React.FC = () => {
   }, [isMobile]);
 
   return (
-    <main id="main-content" className={`max-w-2xl mx-auto px-4 py-4 md:py-12 relative pb-24 ${lang === 'my' ? 'lang-my' : ''}`}>
+    <main 
+      id="main-content" 
+      className={`max-w-2xl mx-auto px-4 py-4 md:py-12 relative transition-all duration-300 ${
+        currentlyPlayingAudio ? 'pb-48' : 'pb-24'
+      } ${lang === 'my' ? 'lang-my' : ''}`}
+    >
       <GlobalOfflineBanner />
       <motion.header 
         className="text-center mb-6 md:mb-16 relative pt-4 md:pt-12"
