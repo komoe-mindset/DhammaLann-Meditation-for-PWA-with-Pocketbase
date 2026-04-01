@@ -38,6 +38,7 @@ const App: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedAudio, setSelectedAudio] = useState<AudioGuide | null>(null);
   const [currentlyPlayingAudio, setCurrentlyPlayingAudio] = useState<AudioGuide | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const itemRefs = useRef<Map<number, HTMLDivElement | null>>(new Map());
   
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -94,6 +95,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const fetchPocketbaseData = async () => {
+      setIsLoading(true);
       try {
         const records = await pb.collection('meditations').getFullList({
           sort: '+day_number',
@@ -118,6 +120,8 @@ const App: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching PocketBase data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -275,6 +279,7 @@ const App: React.FC = () => {
           alt="Dhammalann Logo" 
           className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 md:mb-6 drop-shadow-2xl rounded-2xl"
           fetchPriority="high"
+          loading="lazy"
           referrerPolicy="no-referrer"
         />
         <h1 className={`font-bold mb-2 text-balance break-keep ${lang === 'my' ? 'text-[22px] sm:text-3xl md:text-4xl leading-[1.6]' : 'text-2xl md:text-3xl leading-tight'}`}>
@@ -313,6 +318,7 @@ const App: React.FC = () => {
             t={t}
             lang={lang}
             itemRefs={itemRefs}
+            isLoading={isLoading}
           />
         </div>
       </motion.section>

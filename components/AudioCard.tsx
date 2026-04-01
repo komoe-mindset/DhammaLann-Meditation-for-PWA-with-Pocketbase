@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Info } from 'lucide-react';
+import { Info, Play, Check, FileAudio } from 'lucide-react';
 import { AudioGuide } from '../types';
 
 interface AudioCardProps {
@@ -50,13 +50,9 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
               : 'bg-white/10 text-white/40'
           }`}>
             {guide.audioUrl ? (
-              <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"/>
-              </svg>
+              <Play className="w-6 h-6 fill-current ml-1" />
             ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
-              </svg>
+              <FileAudio className="w-6 h-6" />
             )}
           </div>
           <span className="text-[10px] font-bold text-white/90 uppercase tracking-widest">
@@ -109,9 +105,7 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
-                  </svg>
+                  <Check className="w-4 h-4 stroke-[3]" />
                 </motion.div>
               ) : (
                 <motion.span 

@@ -14,6 +14,7 @@ interface AudioListContainerProps {
   };
   lang: 'my' | 'en';
   itemRefs: React.MutableRefObject<Map<number, HTMLDivElement | null>>;
+  isLoading?: boolean;
 }
 
 const AudioListContainer: React.FC<AudioListContainerProps> = ({
@@ -23,7 +24,8 @@ const AudioListContainer: React.FC<AudioListContainerProps> = ({
   firstUncompletedId,
   t,
   lang,
-  itemRefs
+  itemRefs,
+  isLoading = false
 }) => {
   // Helper to convert numbers to Myanmar digits
   const toMyanmarDigits = (num: number) => {
@@ -52,6 +54,24 @@ const AudioListContainer: React.FC<AudioListContainerProps> = ({
     setOpenMonth(openMonth === index ? null : index);
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 -mr-2 custom-scrollbar pb-4">
+        {[...Array(12)].map((_, i) => (
+          <div key={i} className="rounded-3xl bg-white/5 border border-white/10 p-6 animate-pulse">
+            <div className="flex items-center gap-5">
+              <div className="w-12 h-12 rounded-2xl bg-white/10"></div>
+              <div className="flex-1 space-y-3">
+                <div className="h-4 w-24 bg-white/10 rounded"></div>
+                <div className="h-2 w-full bg-white/5 rounded"></div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 -mr-2 custom-scrollbar pb-4">
       {months.map((monthItems, index) => {
@@ -76,6 +96,8 @@ const AudioListContainer: React.FC<AudioListContainerProps> = ({
             <button
               onClick={() => toggleMonth(index)}
               className="w-full px-6 py-5 flex items-center justify-between text-left group relative"
+              aria-expanded={isOpen}
+              aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${lang === 'my' ? `${myMonthNumber} လ` : `Month ${monthNumber}`}`}
             >
               <div className="flex items-center gap-5">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-base transition-all ${

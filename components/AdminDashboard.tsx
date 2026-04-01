@@ -1,7 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PocketBase from 'pocketbase';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Upload, List, LogOut, CheckCircle2, AlertCircle, Loader2, Music, Calendar, Hash, Type, Grid3X3, X } from 'lucide-react';
+import { 
+  Lock, 
+  Upload, 
+  List, 
+  LogOut, 
+  CheckCircle2, 
+  AlertCircle, 
+  Loader2, 
+  Music, 
+  Calendar, 
+  Hash, 
+  Type, 
+  Grid3X3, 
+  X 
+} from 'lucide-react';
 
 const pb = new PocketBase('https://api.mindset-it.online');
 
@@ -416,6 +430,7 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                           target="_blank" 
                           rel="noreferrer"
                           className="p-2 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-all"
+                          aria-label={`Listen to Day ${record.day_number}`}
                         >
                           <Music className="w-4 h-4" />
                         </a>
