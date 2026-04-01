@@ -7,7 +7,6 @@ interface BottomNavDockProps {
   setLang: (lang: 'my' | 'en') => void;
   onOpenAdminDashboard: () => void;
   t: any;
-  isAdmin: boolean;
 }
 
 const BottomNavDock: React.FC<BottomNavDockProps> = ({
@@ -17,7 +16,6 @@ const BottomNavDock: React.FC<BottomNavDockProps> = ({
   setLang,
   onOpenAdminDashboard,
   t,
-  isAdmin
 }) => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
@@ -79,15 +77,15 @@ const BottomNavDock: React.FC<BottomNavDockProps> = ({
 
         <button 
           onClick={onOpenAdminDashboard} 
-          className={`flex-1 p-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all active:scale-90 border ${isAdmin ? 'bg-[#D4AF37]/20 border-[#D4AF37]/30' : 'bg-white/5 border-white/10'}`}
+          className="flex-1 p-3 rounded-full flex flex-col items-center justify-center gap-1 transition-all active:scale-90 border bg-white/5 border-white/10 hover:bg-white/10"
           title="Admin Dashboard"
           aria-label="Admin Dashboard"
         >
-          <svg className={`w-5 h-5 ${isAdmin ? 'text-[#D4AF37]' : 'text-white/80'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          <span className={`text-[8px] font-bold uppercase tracking-tighter ${isAdmin ? 'text-[#D4AF37]' : 'text-white/60'}`}>Admin</span>
+          <span className="text-[8px] font-bold uppercase tracking-tighter text-white/60">Admin</span>
         </button>
       </div>
     </nav>

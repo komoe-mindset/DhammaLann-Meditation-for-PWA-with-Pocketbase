@@ -17,7 +17,6 @@ const pb = new PocketBase('https://api.mindset-it.online');
 // Lazy load non-critical components
 const ExplanationModal = lazy(() => import('./components/ExplanationModal'));
 const InstallModal = lazy(() => import('./components/InstallModal'));
-const AdminPinModal = lazy(() => import('./components/AdminPinModal'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 
 /**
@@ -43,11 +42,6 @@ const App: React.FC = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showIosModal, setShowIosModal] = useState(false);
   const [showAndroidModal, setShowAndroidModal] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('mindful_is_admin') === 'true');
-  const [showPinModal, setShowPinModal] = useState(false);
-  const [pinInput, setPinInput] = useState('');
-  const [pendingUrl, setPendingUrl] = useState<string | null>(null);
-  const [pinError, setPinError] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -209,42 +203,12 @@ const App: React.FC = () => {
     upNext: lang === 'my' ? "နောက်ထပ် နာယူရန်" : "Up Next",
     continueJourney: lang === 'my' ? "ဓမ္မလမ်း ကို ဆက်လက်လျှောက်လှမ်းပါ" : "Continue your journey",
     streakLabel: lang === 'my' ? "ရက်ဆက်တိုက်" : "Day Streak",
-    adminPinTitle: lang === 'my' ? "Admin Access လိုအပ်ပါသည်" : "Admin Access Required",
-    adminPinDesc: lang === 'my' ? "ဤလင့်ခ်ကို ကြည့်ရှုရန် PIN ကုဒ် ရိုက်ထည့်ပါ" : "Enter PIN code to access this link",
-    enterPin: lang === 'my' ? "PIN ကုဒ် ရိုက်ထည့်ပါ" : "Enter PIN Code",
-    invalidPin: lang === 'my' ? "PIN ကုဒ် မှားယွင်းနေပါသည်" : "Invalid PIN Code",
     submit: lang === 'my' ? "အတည်ပြုရန်" : "Submit"
   }), [lang]);
 
   const handleAdminClick = useCallback(() => {
-    if (isAdmin) {
-      setShowAdminDashboard(true);
-    } else {
-      setPendingUrl('OPEN_ADMIN_DASHBOARD');
-      setShowPinModal(true);
-      setPinInput('');
-      setPinError(false);
-    }
-  }, [isAdmin]);
-
-  const handlePinSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    if (pinInput === '666666') {
-      setIsAdmin(true);
-      localStorage.setItem('mindful_is_admin', 'true');
-      setShowPinModal(false);
-      if (pendingUrl === 'OPEN_ADMIN_DASHBOARD') {
-        setShowAdminDashboard(true);
-        setPendingUrl(null);
-      } else if (pendingUrl) {
-        window.open(pendingUrl, '_blank');
-        setPendingUrl(null);
-      }
-    } else {
-      setPinError(true);
-      setPinInput('');
-    }
-  }, [pinInput, pendingUrl]);
+    setShowAdminDashboard(true);
+  }, []);
 
   const handleInstallClick = useCallback(async () => {
     if (deferredPrompt) {
@@ -442,18 +406,6 @@ const App: React.FC = () => {
             onClose={() => setShowAndroidModal(false)}
           />
         )}
-
-        {/* Admin PIN Modal */}
-        {showPinModal && (
-          <AdminPinModal 
-            pinInput={pinInput}
-            pinError={pinError}
-            t={t}
-            onPinChange={(val) => { setPinInput(val); setPinError(false); }}
-            onSubmit={handlePinSubmit}
-            onClose={() => setShowPinModal(false)}
-          />
-        )}
       </Suspense>
 
       <StickyMiniPlayer 
@@ -469,7 +421,6 @@ const App: React.FC = () => {
         setLang={setLang}
         onOpenAdminDashboard={handleAdminClick}
         t={t}
-        isAdmin={isAdmin}
       />
 
       <footer className="mt-12 text-center pb-8 opacity-40 border-t border-gray-200 pt-8">

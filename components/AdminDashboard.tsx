@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PocketBase from 'pocketbase';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Upload, List, LogOut, CheckCircle2, AlertCircle, Loader2, Music, Calendar, Hash, Type } from 'lucide-react';
+import { Lock, Upload, List, LogOut, CheckCircle2, AlertCircle, Loader2, Music, Calendar, Hash, Type, Grid3X3, X } from 'lucide-react';
 
 const pb = new PocketBase('https://api.mindset-it.online');
 
@@ -16,7 +16,7 @@ interface MeditationRecord {
 }
 
 const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(pb.authStore.isValid && pb.authStore.isAdmin);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => pb.authStore.isValid && pb.authStore.isAdmin);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,6 +32,7 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   // List states
   const [records, setRecords] = useState<MeditationRecord[]>([]);
   const [fetchingRecords, setFetchingRecords] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const fetchRecords = useCallback(async () => {
     setFetchingRecords(true);
@@ -53,13 +54,21 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }
   }, [isLoggedIn, fetchRecords]);
 
+  // Listen to auth changes
+  useEffect(() => {
+    const unsubscribe = pb.authStore.onChange(() => {
+      setIsLoggedIn(pb.authStore.isValid && pb.authStore.isAdmin);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
       await pb.admins.authWithPassword(email, password);
-      setIsLoggedIn(true);
+      // setIsLoggedIn will be updated by the listener
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -69,7 +78,18 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const handleLogout = () => {
     pb.authStore.clear();
-    setIsLoggedIn(false);
+    // setIsLoggedIn will be updated by the listener
+  };
+
+  const handleDayClick = (day: number, exists: boolean) => {
+    if (!exists) {
+      setDayNumber(day.toString());
+      // Scroll to form on mobile
+      const formElement = document.getElementById('upload-form');
+      if (formElement) {
+        formElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
   };
 
   const handleUpload = async (e: React.FormEvent) => {
@@ -201,7 +221,7 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Upload Form */}
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-5" id="upload-form">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -315,7 +335,7 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </motion.div>
           </div>
 
-          {/* List View */}
+          {/* List/Grid View */}
           <div className="lg:col-span-7">
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
@@ -324,18 +344,50 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
-                  <List className="text-[#D4AF37] w-6 h-6" />
-                  <h2 className="text-xl font-bold text-white">Existing Records</h2>
+                  <Grid3X3 className="text-[#D4AF37] w-6 h-6" />
+                  <h2 className="text-xl font-bold text-white">365-Day Tracker</h2>
                 </div>
-                <span className="bg-white/5 px-3 py-1 rounded-full text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                  {records.length} / 365
-                </span>
+                <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl">
+                  <button 
+                    onClick={() => setViewMode('grid')}
+                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'grid' ? 'bg-[#B8860B] text-white' : 'text-white/40 hover:text-white/60'}`}
+                  >
+                    Grid
+                  </button>
+                  <button 
+                    onClick={() => setViewMode('list')}
+                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'list' ? 'bg-[#B8860B] text-white' : 'text-white/40 hover:text-white/60'}`}
+                  >
+                    List
+                  </button>
+                </div>
               </div>
 
               {fetchingRecords ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
                   <Loader2 className="w-8 h-8 text-[#D4AF37] animate-spin" />
                   <p className="text-white/40 text-sm italic">Loading library...</p>
+                </div>
+              ) : viewMode === 'grid' ? (
+                <div className="grid grid-cols-7 sm:grid-cols-10 md:grid-cols-12 gap-2">
+                  {Array.from({ length: 365 }, (_, i) => i + 1).map((day) => {
+                    const record = records.find(r => r.day_number === day);
+                    const exists = !!record;
+                    return (
+                      <button
+                        key={day}
+                        onClick={() => handleDayClick(day, exists)}
+                        className={`aspect-square rounded-lg flex items-center justify-center text-[10px] font-bold transition-all ${
+                          exists 
+                            ? 'bg-green-500/20 text-green-400 border border-green-500/30 cursor-default' 
+                            : 'bg-red-500/10 text-red-400/50 border border-red-500/20 hover:bg-red-500/20 hover:text-red-400 cursor-pointer active:scale-90'
+                        }`}
+                        title={exists ? `Day ${day}: ${record.title}` : `Day ${day}: Missing`}
+                      >
+                        {day}
+                      </button>
+                    );
+                  })}
                 </div>
               ) : records.length === 0 ? (
                 <div className="text-center py-20">
