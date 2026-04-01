@@ -170,12 +170,12 @@ const App: React.FC = () => {
 
   const playAudio = useCallback((guide: AudioGuide) => {
     setSelectedAudio(guide);
-    setCurrentlyPlayingAudio(guide);
   }, []);
 
   const listenNow = useCallback((guide: AudioGuide) => {
     if (guide.audioUrl) {
-      window.open(guide.audioUrl, '_blank');
+      setCurrentlyPlayingAudio(guide);
+      setSelectedAudio(null);
     }
   }, []);
 

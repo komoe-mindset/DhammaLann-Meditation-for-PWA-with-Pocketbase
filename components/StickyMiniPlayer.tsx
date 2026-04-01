@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AudioGuide } from '../types';
 
@@ -14,6 +14,23 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
   lang 
 }) => {
   const [isPlaying, setIsPlaying] = useState(true);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    if (currentlyPlayingAudio) {
+      setIsPlaying(true);
+    }
+  }, [currentlyPlayingAudio]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.play().catch(e => console.error("Playback failed", e));
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [isPlaying, currentlyPlayingAudio]);
 
   if (!currentlyPlayingAudio) return null;
 
@@ -55,6 +72,16 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
 
             {/* Controls */}
             <div className="flex items-center gap-2">
+              {currentlyPlayingAudio.audioUrl && (
+                <audio 
+                  ref={audioRef}
+                  src={currentlyPlayingAudio.audioUrl}
+                  onEnded={() => setIsPlaying(false)}
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  autoPlay
+                />
+              )}
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all active:scale-90"
