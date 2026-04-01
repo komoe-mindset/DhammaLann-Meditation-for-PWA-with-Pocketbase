@@ -18,6 +18,7 @@ const pb = new PocketBase('https://api.mindset-it.online');
 const ExplanationModal = lazy(() => import('./components/ExplanationModal'));
 const InstallModal = lazy(() => import('./components/InstallModal'));
 const AdminPinModal = lazy(() => import('./components/AdminPinModal'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 
 /**
  * AUDIO LINK SYSTEM
@@ -47,6 +48,7 @@ const App: React.FC = () => {
   const [pinInput, setPinInput] = useState('');
   const [pendingUrl, setPendingUrl] = useState<string | null>(null);
   const [pinError, setPinError] = useState(false);
+  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -214,11 +216,11 @@ const App: React.FC = () => {
     submit: lang === 'my' ? "အတည်ပြုရန်" : "Submit"
   }), [lang]);
 
-  const handleAdminLinkClick = useCallback((url: string) => {
+  const handleAdminClick = useCallback(() => {
     if (isAdmin) {
-      window.open(url, '_blank');
+      setShowAdminDashboard(true);
     } else {
-      setPendingUrl(url);
+      setPendingUrl('OPEN_ADMIN_DASHBOARD');
       setShowPinModal(true);
       setPinInput('');
       setPinError(false);
@@ -231,7 +233,10 @@ const App: React.FC = () => {
       setIsAdmin(true);
       localStorage.setItem('mindful_is_admin', 'true');
       setShowPinModal(false);
-      if (pendingUrl) {
+      if (pendingUrl === 'OPEN_ADMIN_DASHBOARD') {
+        setShowAdminDashboard(true);
+        setPendingUrl(null);
+      } else if (pendingUrl) {
         window.open(pendingUrl, '_blank');
         setPendingUrl(null);
       }
@@ -404,6 +409,11 @@ const App: React.FC = () => {
           <div className="w-10 h-10 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin shadow-lg"></div>
         </div>
       }>
+        {/* Admin Dashboard */}
+        {showAdminDashboard && (
+          <AdminDashboard onClose={() => setShowAdminDashboard(false)} />
+        )}
+
         {/* Explanation Modal */}
         {selectedAudio && (
           <ExplanationModal 
@@ -457,8 +467,9 @@ const App: React.FC = () => {
         handleInstallClick={handleInstallClick}
         lang={lang}
         setLang={setLang}
-        handleAdminLinkClick={handleAdminLinkClick}
+        onOpenAdminDashboard={handleAdminClick}
         t={t}
+        isAdmin={isAdmin}
       />
 
       <footer className="mt-12 text-center pb-8 opacity-40 border-t border-gray-200 pt-8">
