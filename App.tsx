@@ -1,7 +1,7 @@
 
 import PocketBase from 'pocketbase';
 import React, { useState, useEffect, Suspense, lazy, useMemo, useCallback, useRef } from 'react';
-import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AudioGuide } from './types';
 import { meditationItems } from './data/meditationData';
 import logoUrl from './public/icon.svg';
@@ -209,7 +209,7 @@ const App: React.FC = () => {
     iosInstallDesc: lang === 'my' ? "App ထည့်သွင်းရန်: သင့်ဖုန်း၏ Share icon ကိုနှိပ်ပြီး 'Add to Home Screen' ကိုရွေးချယ်ပါ။" : "To install: Tap the Share icon at the bottom of your screen, then select 'Add to Home Screen'.",
     androidInstallDesc: lang === 'my' ? "App ထည့်သွင်းရန်: ဘရောက်ဇာမီနူး (အစက်သုံးစက်) ကိုနှိပ်ပြီး 'Install app' သို့မဟုတ် 'Add to Home screen' ကိုရွေးချယ်ပါ။" : "To install: Tap the browser menu (three dots) at the top right, then select 'Install app' or 'Add to Home screen'.",
     upNext: lang === 'my' ? "နောက်ထပ် နာယူရန်" : "Up Next",
-    continueJourney: lang === 'my' ? "Dhamma Lann Meditation" : "Dhamma Lann Meditation",
+    continueJourney: lang === 'my' ? "ဓမ္မလမ်း ကိုလျှောက်ကြမယ်" : "Let's walk the Dhamma path",
     streakLabel: lang === 'my' ? "ရက်ဆက်တိုက်" : "Day Streak",
     submit: lang === 'my' ? "အတည်ပြုရန်" : "Submit"
   }), [lang]);
@@ -250,33 +250,30 @@ const App: React.FC = () => {
   }, [isMobile]);
 
   return (
-    <LazyMotion features={domAnimation}>
-      <main 
-        id="main-content" 
-        className={`max-w-2xl mx-auto px-4 py-4 md:py-12 relative transition-all duration-300 ${
-          currentlyPlayingAudio ? 'pb-48' : 'pb-24'
-        } ${lang === 'my' ? 'lang-my' : ''}`}
+    <main 
+      id="main-content" 
+      className={`max-w-2xl mx-auto px-4 py-4 md:py-12 relative transition-all duration-300 ${
+        currentlyPlayingAudio ? 'pb-48' : 'pb-24'
+      } ${lang === 'my' ? 'lang-my' : ''}`}
+    >
+      <GlobalOfflineBanner />
+      <motion.header 
+        className="text-center mb-6 md:mb-16 relative pt-4 md:pt-12"
+        {...animationProps}
       >
-        <GlobalOfflineBanner />
-        <m.header 
-          className="text-center mb-6 md:mb-16 relative pt-4 md:pt-12"
-          {...animationProps}
-        >
         <img 
           src={logoUrl} 
           alt="Dhammalann Logo" 
-          width="96"
-          height="96"
           className="w-16 h-16 md:w-24 md:h-24 mx-auto mb-4 md:mb-6 drop-shadow-2xl rounded-2xl"
           fetchPriority="high"
-          loading="eager"
+          loading="lazy"
           referrerPolicy="no-referrer"
         />
-        <h1 className={`font-bold mb-2 text-balance break-keep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-4 focus-visible:ring-offset-[#051a12] rounded-lg ${lang === 'my' ? 'text-[22px] sm:text-3xl md:text-4xl leading-[1.6]' : 'text-2xl md:text-3xl leading-tight'}`} tabIndex={0}>
+        <h1 className={`font-bold mb-2 text-balance break-keep ${lang === 'my' ? 'text-[22px] sm:text-3xl md:text-4xl leading-[1.6]' : 'text-2xl md:text-3xl leading-tight'}`}>
           {t.titleEn}
         </h1>
         <div className="h-0.5 w-10 bg-[#B8860B] mx-auto rounded-full opacity-30" aria-hidden="true"></div>
-      </m.header>
+      </motion.header>
 
       <UpNextCard 
         nextAudio={nextAudio}
@@ -287,7 +284,7 @@ const App: React.FC = () => {
       />
 
       {/* Audio Section - PRIMARY FOCUS */}
-      <m.section 
+      <motion.section 
         className="glass-card rounded-[2.5rem] p-6 md:p-10 mb-8 text-white shadow-2xl relative overflow-hidden border-2 border-[#D4AF37]/30"
         {...animationProps}
         transition={{ ...animationProps.transition, delay: 0.1 }}
@@ -311,10 +308,10 @@ const App: React.FC = () => {
             isLoading={isLoading}
           />
         </div>
-      </m.section>
+      </motion.section>
 
       {/* Patron Information Section */}
-      <m.section 
+      <motion.section 
         className="mb-12"
         {...animationProps}
         transition={{ ...animationProps.transition, delay: 0.2 }}
@@ -322,7 +319,7 @@ const App: React.FC = () => {
         <div className="glass-card rounded-[2rem] p-8 border-l-4 border-[#D4AF37] shadow-2xl flex flex-col items-center text-center space-y-4 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-[#D4AF37]/5 rounded-full -mr-12 -mt-12"></div>
           <div className="space-y-2 relative z-10">
-            <h2 className="text-xs font-bold gold-text uppercase tracking-[0.2em]">Our Spiritual Patron</h2>
+            <h2 className="text-[10px] font-bold gold-text uppercase tracking-[0.2em]">Our Spiritual Patron</h2>
             <p className={`text-white font-serif italic leading-relaxed md:text-lg ${lang === 'my' ? 'text-base' : 'text-sm'}`}>
               {t.patronInfo}
             </p>
@@ -332,7 +329,7 @@ const App: React.FC = () => {
               href={PATRON_WEBSITE_URL} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="flex items-center justify-center gap-2 px-6 py-4 min-h-[48px] bg-[#B8860B] text-white rounded-2xl text-xs font-bold shadow-lg hover:bg-[#9a700a] transition-all active-scale border border-[#FCF6BA]/30"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-[#B8860B] text-white rounded-2xl text-xs font-bold shadow-lg hover:bg-[#9a700a] transition-all active-scale border border-[#FCF6BA]/30"
             >
               {t.visitWebsite}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -341,7 +338,7 @@ const App: React.FC = () => {
               href={AUDIO_SUMMARY_URL} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="flex items-center justify-center gap-2 px-6 py-4 min-h-[48px] bg-white/5 text-white/80 rounded-2xl text-xs font-bold shadow-lg hover:bg-white/10 transition-all active-scale border border-white/10"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 text-white/80 rounded-2xl text-xs font-bold shadow-lg hover:bg-white/10 transition-all active-scale border border-white/10"
             >
               {t.audioSummary}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
@@ -350,18 +347,18 @@ const App: React.FC = () => {
               href={NOTEBOOK_LM_URL} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="flex items-center justify-center gap-2 px-6 py-4 min-h-[48px] bg-white/5 text-white/80 rounded-2xl text-xs font-bold shadow-lg hover:bg-white/10 transition-all active-scale border border-white/10"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 text-white/80 rounded-2xl text-xs font-bold shadow-lg hover:bg-white/10 transition-all active-scale border border-white/10"
             >
               {t.notebookLM}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.989-2.386l-.548-.547z" /></svg>
             </a>
           </div>
         </div>
-      </m.section>
+      </motion.section>
 
       <AnimatePresence>
         {successMessage && (
-          <m.div 
+          <motion.div 
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
@@ -370,7 +367,7 @@ const App: React.FC = () => {
             aria-live="polite"
           >
             {successMessage}
-          </m.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -430,10 +427,9 @@ const App: React.FC = () => {
       />
 
       <footer className="mt-12 text-center pb-8 opacity-40 border-t border-gray-200 pt-8">
-        <p className="text-xs tracking-[0.3em] font-bold text-teal-900/60 uppercase">Mindful Project / {new Date().getFullYear()}</p>
+        <p className="text-[10px] tracking-[0.3em] font-bold text-teal-900/60 uppercase">Mindful Project / {new Date().getFullYear()}</p>
       </footer>
     </main>
-    </LazyMotion>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GroupedVirtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { AudioGuide } from '../types';
 import AudioCard from './AudioCard';
@@ -45,70 +45,23 @@ const AudioListContainer: React.FC<AudioListContainerProps> = ({
     return groups;
   }, [audioGuides]);
 
-  // Determine number of columns based on screen width
-  const [columns, setColumns] = useState(3);
-  useEffect(() => {
-    const updateColumns = () => {
-      if (window.innerWidth >= 768) setColumns(5);
-      else if (window.innerWidth >= 640) setColumns(4);
-      else setColumns(3);
-    };
-    updateColumns();
-    window.addEventListener('resize', updateColumns);
-    return () => window.removeEventListener('resize', updateColumns);
-  }, []);
-
-  // Chunk items within each month into rows
-  const chunkedMonths = useMemo(() => {
-    return months.map(monthItems => {
-      const rows: AudioGuide[][] = [];
-      for (let i = 0; i < monthItems.length; i += columns) {
-        rows.push(monthItems.slice(i, i + columns));
-      }
-      return rows;
-    });
-  }, [months, columns]);
-
-  const groupCounts = useMemo(() => chunkedMonths.map(m => m.length), [chunkedMonths]);
-
-  // Flatten rows for easier indexing in itemContent if needed, 
-  // but Virtuoso handles grouped indexing well.
-  // Actually, GroupedVirtuoso itemContent receives the absolute index across all groups.
-  // We need to map that back to the correct row in the correct group.
-  const flattenedRows = useMemo(() => chunkedMonths.flat(), [chunkedMonths]);
+  const groupCounts = useMemo(() => months.map(m => m.length), [months]);
 
   // Scroll to the first uncompleted item on load
   useEffect(() => {
     if (firstUncompletedId && virtuosoRef.current && !isLoading) {
-      // Find the row index for the first uncompleted item
-      const itemIndex = audioGuides.findIndex(g => g.id === firstUncompletedId);
-      if (itemIndex !== -1) {
-        // This is tricky because we need the row index, not the item index.
-        // Let's calculate the absolute row index.
-        let absoluteRowIndex = 0;
-        let found = false;
-        for (const monthRows of chunkedMonths) {
-          for (const row of monthRows) {
-            if (row.some(g => g.id === firstUncompletedId)) {
-              found = true;
-              break;
-            }
-            absoluteRowIndex++;
-          }
-          if (found) break;
-        }
-
-        const timer = setTimeout(() => {
-          virtuosoRef.current?.scrollToIndex({
-            index: absoluteRowIndex,
-            align: 'center',
-            behavior: 'smooth'
-          });
-        }, 800);
-        return () => clearTimeout(timer);
-      }
+      const index = firstUncompletedId - 1;
+      // Small delay to ensure virtuoso is ready
+      const timer = setTimeout(() => {
+        virtuosoRef.current?.scrollToIndex({
+          index,
+          align: 'center',
+          behavior: 'smooth'
+        });
+      }, 800);
+      return () => clearTimeout(timer);
     }
-  }, [firstUncompletedId, isLoading, chunkedMonths, audioGuides]);
+  }, [firstUncompletedId, isLoading]);
 
   if (isLoading) {
     return (
@@ -143,8 +96,8 @@ const AudioListContainer: React.FC<AudioListContainerProps> = ({
           const isFullyCompleted = completedCount === totalCount;
 
           return (
-            <div className="py-4 bg-[#051a12] z-20">
-              <div className={`rounded-3xl overflow-hidden border transition-all duration-300 bg-white/10 border-[#D4AF37]/40 shadow-xl focus-within:ring-2 focus-within:ring-[#D4AF37] focus-within:ring-offset-2 focus-within:ring-offset-[#051a12]`}>
+            <div className="py-4 bg-[#051a12] z-20" style={{ gridColumn: '1 / -1' }}>
+              <div className={`rounded-3xl overflow-hidden border transition-all duration-300 bg-white/10 border-[#D4AF37]/40 shadow-xl`}>
                 <div className="w-full px-6 py-5 flex items-center justify-between text-left group relative">
                   <div className="flex items-center gap-5">
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-base transition-all ${
@@ -166,7 +119,7 @@ const AudioListContainer: React.FC<AudioListContainerProps> = ({
                             : `${completedCount} / ${totalCount} Days Completed`}
                         </p>
                         <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                          <m.div 
+                          <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: `${progressPercentage}%` }}
                             transition={{ duration: 1, ease: "easeOut" }}
@@ -182,30 +135,50 @@ const AudioListContainer: React.FC<AudioListContainerProps> = ({
           );
         }}
         itemContent={(index) => {
-          const row = flattenedRows[index];
+          const guide = audioGuides[index];
           return (
-            <div 
-              className="grid gap-2 p-2" 
-              style={{ 
-                gridTemplateColumns: `repeat(${columns}, 1fr)` 
-              }}
-            >
-              {row.map(guide => (
-                <AudioCard 
-                  key={guide.id}
-                  ref={(el) => {
-                    if (el) itemRefs.current.set(guide.id, el);
-                    else itemRefs.current.delete(guide.id);
-                  }}
-                  guide={guide}
-                  onPlay={onPlay}
-                  onToggleDone={onToggleDone}
-                  isHighlighted={guide.id === firstUncompletedId}
-                  t={{ play: t.play, dayLabel: t.dayLabel }}
-                />
-              ))}
+            <div className="p-2">
+              <AudioCard 
+                key={guide.id}
+                ref={(el) => {
+                  if (el) itemRefs.current.set(guide.id, el);
+                  else itemRefs.current.delete(guide.id);
+                }}
+                guide={guide}
+                onPlay={onPlay}
+                onToggleDone={onToggleDone}
+                isHighlighted={guide.id === firstUncompletedId}
+                t={{ play: t.play, dayLabel: t.dayLabel }}
+              />
             </div>
           );
+        }}
+        components={{
+          List: React.forwardRef<HTMLDivElement, any>(({ children, style, ...props }, ref) => (
+            <div
+              {...props}
+              ref={ref}
+              style={{
+                ...style,
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '0px',
+              }}
+              className="sm:grid-cols-4 md:grid-cols-5"
+            >
+              {children}
+            </div>
+          )),
+          Item: ({ children, style, ...props }: any) => (
+            <div
+              {...props}
+              style={{
+                ...style,
+              }}
+            >
+              {children}
+            </div>
+          ),
         }}
       />
     </div>

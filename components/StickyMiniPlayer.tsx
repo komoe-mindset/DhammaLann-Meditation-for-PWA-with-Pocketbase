@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Play, Pause, X, AlertCircle, RefreshCw } from 'lucide-react';
 import { AudioGuide } from '../types';
 
@@ -62,7 +62,7 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
   return (
     <AnimatePresence>
       {currentlyPlayingAudio && (
-        <m.div
+        <motion.div
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
@@ -113,7 +113,7 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
               {error ? (
                 <button
                   onClick={handleRetry}
-                  className="p-2 min-w-[48px] min-h-[48px] rounded-full bg-red-500/20 hover:bg-red-500/30 flex items-center justify-center transition-all active:scale-90 text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12]"
+                  className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/30 flex items-center justify-center transition-all active:scale-90 text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12]"
                   aria-label="Retry"
                 >
                   <RefreshCw className="w-5 h-5" />
@@ -121,7 +121,7 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
               ) : (
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="p-2 min-w-[48px] min-h-[48px] rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12]"
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12]"
                   aria-label={isPlaying ? "Pause" : "Play"}
                   disabled={isBuffering}
                 >
@@ -137,7 +137,7 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
               
               <button
                 onClick={onClose}
-                className="p-2 min-w-[48px] min-h-[48px] rounded-full flex items-center justify-center text-white/40 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12]"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12]"
                 aria-label="Close Player"
               >
                 <X className="w-5 h-5" />
@@ -148,7 +148,7 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
           {/* Error Tooltip */}
           <AnimatePresence>
             {error && (
-              <m.div
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
@@ -156,10 +156,10 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
               >
                 <AlertCircle className="w-3 h-3" />
                 {error}
-              </m.div>
+              </motion.div>
             )}
           </AnimatePresence>
-        </m.div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

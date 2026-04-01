@@ -1,5 +1,5 @@
 import React from 'react';
-import { m } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { AudioGuide } from '../types';
 
 interface UpNextCardProps {
@@ -29,7 +29,7 @@ const UpNextCard: React.FC<UpNextCardProps> = ({ nextAudio, onPlay, currentStrea
   const streakDisplay = lang === 'my' ? toMyanmarDigits(currentStreak) : currentStreak;
 
   return (
-    <m.div
+    <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
@@ -46,7 +46,7 @@ const UpNextCard: React.FC<UpNextCardProps> = ({ nextAudio, onPlay, currentStrea
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
           <div className="text-center md:text-left space-y-2 md:space-y-4">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs md:text-xs font-bold uppercase tracking-[0.2em]">
+              <div className="inline-flex items-center gap-2 px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em]">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]"></span>
@@ -55,16 +55,16 @@ const UpNextCard: React.FC<UpNextCardProps> = ({ nextAudio, onPlay, currentStrea
               </div>
 
               {currentStreak > 0 && (
-                <m.div 
+                <motion.div 
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   className="inline-flex items-center gap-1.5 px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]"
                 >
                   <span className="text-sm md:text-base">🔥</span>
-                  <span className="text-xs md:text-sm font-black bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent uppercase tracking-wider">
+                  <span className="text-[10px] md:text-xs font-black bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent uppercase tracking-wider">
                     {lang === 'my' ? `${streakDisplay} ${t.streakLabel}` : `${streakDisplay} ${t.streakLabel}`}
                   </span>
-                </m.div>
+                </motion.div>
               )}
             </div>
             
@@ -78,17 +78,17 @@ const UpNextCard: React.FC<UpNextCardProps> = ({ nextAudio, onPlay, currentStrea
             </div>
 
             {nextAudio.fileName && (
-              <p className="text-teal-100/60 text-xs md:text-sm italic max-w-md line-clamp-1 md:line-clamp-none">
+              <p className="text-teal-100/60 text-[10px] md:text-sm italic max-w-md line-clamp-1 md:line-clamp-none">
                 "{nextAudio.fileName}"
               </p>
             )}
           </div>
 
-          <m.button
+          <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => onPlay(nextAudio)}
-            className="flex items-center gap-3 md:gap-4 px-6 py-3 md:px-10 md:py-5 bg-gradient-to-r from-[#B8860B] to-[#D4AF37] rounded-full text-white font-bold shadow-[0_10px_30px_rgba(184,134,11,0.4)] hover:shadow-[0_15px_40px_rgba(184,134,11,0.6)] transition-all group/btn relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12]"
+            className="flex items-center gap-3 md:gap-4 px-6 py-3 md:px-10 md:py-5 bg-gradient-to-r from-[#B8860B] to-[#D4AF37] rounded-full text-white font-bold shadow-[0_10px_30px_rgba(184,134,11,0.4)] hover:shadow-[0_15px_40px_rgba(184,134,11,0.6)] transition-all group/btn relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
             <span className="relative z-10 text-sm md:text-lg">{t.play}</span>
@@ -97,10 +97,10 @@ const UpNextCard: React.FC<UpNextCardProps> = ({ nextAudio, onPlay, currentStrea
                 <path d="M8 5v14l11-7z" />
               </svg>
             </div>
-          </m.button>
+          </motion.button>
         </div>
       </div>
-    </m.div>
+    </motion.div>
   );
 };
 

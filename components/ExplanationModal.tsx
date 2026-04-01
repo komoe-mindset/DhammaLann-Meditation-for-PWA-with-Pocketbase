@@ -35,7 +35,7 @@ const ExplanationModal: React.FC<ExplanationModalProps> = ({
             </div>
             <button 
               onClick={onClose}
-              className="p-2 min-w-[48px] min-h-[48px] text-white/40 hover:text-white transition-colors"
+              className="p-2 text-white/40 hover:text-white transition-colors"
               aria-label={t.close}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
