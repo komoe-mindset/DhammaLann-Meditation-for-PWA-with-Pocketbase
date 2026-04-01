@@ -37,7 +37,7 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
         <motion.button 
           onClick={() => onPlay(guide)} 
           whileTap={{ scale: 0.96 }}
-          className={`w-full flex flex-col items-center justify-center pt-7 pb-4 rounded-2xl transition-all border-2 relative ${
+          className={`w-full flex flex-col items-center justify-center pt-7 pb-4 rounded-2xl transition-all border-2 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12] ${
             guide.isCompleted 
               ? 'bg-[#D4AF37]/10 border-[#D4AF37]/30' 
               : 'bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10'
@@ -55,7 +55,7 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
               <FileAudio className="w-6 h-6" />
             )}
           </div>
-          <span className="text-[10px] font-bold text-white/90 uppercase tracking-widest">
+          <span className="text-xs font-bold text-white/90 uppercase tracking-widest">
             {t.dayLabel} {guide.id}
           </span>
         </motion.button>
@@ -68,7 +68,7 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
               setIsExpanded(!isExpanded);
             }}
             whileTap={{ scale: 0.9 }}
-            className={`absolute -bottom-2 -left-2 w-11 h-11 rounded-full shadow-lg transition-all z-20 flex items-center justify-center ${
+            className={`absolute -bottom-2 -left-2 w-11 h-11 rounded-full shadow-lg transition-all z-20 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12] ${
               isExpanded ? 'bg-[#D4AF37] text-white' : 'bg-teal-900/80 text-white/60 hover:text-white'
             }`}
             aria-label="Toggle Info"
@@ -84,7 +84,7 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
             onToggleDone(guide.id); 
           }}
           whileTap={{ scale: 0.9 }}
-          className={`absolute -top-3 -right-3 w-11 h-11 rounded-full shadow-lg transition-all z-20 flex items-center justify-center group/toggle ${
+          className={`absolute -top-3 -right-3 w-11 h-11 rounded-full shadow-lg transition-all z-20 flex items-center justify-center group/toggle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12] ${
             guide.isCompleted 
               ? 'text-white' 
               : 'text-white/70 hover:text-white'
@@ -112,7 +112,7 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
                   key="id"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-[10px] font-bold"
+                  className="text-xs font-bold"
                 >
                   {guide.id}
                 </motion.span>
@@ -145,7 +145,7 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="mt-2 p-3 bg-teal-900/40 backdrop-blur-md rounded-xl border border-white/10 text-white text-[10px] shadow-xl">
+            <div className="mt-2 p-3 bg-teal-900/40 backdrop-blur-md rounded-xl border border-white/10 text-white text-xs shadow-xl">
               {guide.fileName && <div className="font-bold mb-1 gold-text">{guide.fileName}</div>}
               {guide.date && <div className="opacity-60">{guide.date}</div>}
             </div>

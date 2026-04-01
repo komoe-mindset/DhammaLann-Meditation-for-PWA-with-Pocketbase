@@ -201,7 +201,7 @@ const App: React.FC = () => {
   }, []);
 
   const t = useMemo(() => ({
-    titleEn: lang === 'my' ? "ဓမ္မလမ်း ဝိပဿနာ" : "Dhammalann Meditation",
+    titleEn: lang === 'my' ? "ဓမ္မလမ်း ကိုလျှောက်ကြမယ်" : "Let's Walk the Dhamma Path",
     audioTitle: lang === 'my' ? "တရားတော်များ နာယူရန်" : "Audio Sanctuary",
     audioSubtitle: lang === 'my' ? "တစ်နှစ်တာ နေ့စဉ် နာယူရန်" : "365 Days Journey",
     googleSheet: lang === 'my' ? "Google Sheet ကြည့်ရန်" : "View Google Sheet",

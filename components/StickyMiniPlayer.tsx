@@ -78,7 +78,7 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
                 </span>
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] text-[#D4AF37] font-bold uppercase tracking-wider">
+                <p className="text-xs text-[#D4AF37] font-bold uppercase tracking-wider">
                   {dayLabel} {dayDisplay}
                 </p>
                 <h4 className="text-white text-xs font-medium truncate">
@@ -113,7 +113,7 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
               {error ? (
                 <button
                   onClick={handleRetry}
-                  className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/30 flex items-center justify-center transition-all active:scale-90 text-red-400"
+                  className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/30 flex items-center justify-center transition-all active:scale-90 text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12]"
                   aria-label="Retry"
                 >
                   <RefreshCw className="w-5 h-5" />
@@ -121,7 +121,7 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
               ) : (
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all active:scale-90"
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12]"
                   aria-label={isPlaying ? "Pause" : "Play"}
                   disabled={isBuffering}
                 >
@@ -137,7 +137,7 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
               
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12]"
                 aria-label="Close Player"
               >
                 <X className="w-5 h-5" />
@@ -152,7 +152,7 @@ const StickyMiniPlayer: React.FC<StickyMiniPlayerProps> = ({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="absolute -top-10 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-lg flex items-center gap-2 whitespace-nowrap"
+                className="absolute -top-10 left-1/2 -translate-x-1/2 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg flex items-center gap-2 whitespace-nowrap"
               >
                 <AlertCircle className="w-3 h-3" />
                 {error}
