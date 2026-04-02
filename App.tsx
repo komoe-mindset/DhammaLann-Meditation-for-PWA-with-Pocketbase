@@ -12,6 +12,8 @@ import UpNextCard from './components/UpNextCard';
 import StickyMiniPlayer from './components/StickyMiniPlayer';
 import GlobalOfflineBanner from './components/GlobalOfflineBanner';
 
+import { AudioProvider, useAudio } from './src/context/AudioContext';
+
 // Initialize PocketBase
 const pb = new PocketBase('https://api.mindset-it.online');
 
@@ -30,14 +32,17 @@ const PATRON_WEBSITE_URL = "https://drsoelwin.mindset-it.online/";
 const AUDIO_SUMMARY_URL = "https://dhamma-mindset.pages.dev/";
 const NOTEBOOK_LM_URL = "https://notebooklm.google.com/notebook/5c693072-7f7a-40a2-84da-8060c1213a8d";
 
+// Stabilize todayDate outside the component to ensure memoized callbacks remain stable
+const todayDate = new Date().toISOString().split('T')[0];
+
 type Language = 'my' | 'en';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const [lang, setLang] = useState<Language>(() => (localStorage.getItem(LANG_KEY) as Language) || 'my');
   const [audioGuides, setAudioGuides] = useState<AudioGuide[]>(meditationItems);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedAudio, setSelectedAudio] = useState<AudioGuide | null>(null);
-  const [currentlyPlayingAudio, setCurrentlyPlayingAudio] = useState<AudioGuide | null>(null);
+  const { currentAudio, stopAudio, playAudio: contextPlayAudio } = useAudio();
   const [isLoading, setIsLoading] = useState(true);
   const itemRefs = useRef<Map<number, HTMLDivElement | null>>(new Map());
   
@@ -48,8 +53,6 @@ const App: React.FC = () => {
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-
-  const todayDate = new Date().toISOString().split('T')[0];
 
   const firstUncompletedId = useMemo(() => audioGuides.find(g => !g.isCompleted)?.id, [audioGuides]);
   const nextAudio = useMemo(() => audioGuides.find(g => !g.isCompleted), [audioGuides]);
@@ -195,10 +198,10 @@ const App: React.FC = () => {
 
   const listenNow = useCallback((guide: AudioGuide) => {
     if (guide.audioUrl) {
-      setCurrentlyPlayingAudio(guide);
+      contextPlayAudio(guide);
       setSelectedAudio(null);
     }
-  }, []);
+  }, [contextPlayAudio]);
 
   const t = useMemo(() => ({
     titleEn: "Dhamma Lann Meditation",
@@ -266,7 +269,7 @@ const App: React.FC = () => {
     <main 
       id="main-content" 
       className={`max-w-2xl mx-auto px-4 py-4 md:py-12 relative transition-all duration-300 ${
-        currentlyPlayingAudio ? 'pb-48' : 'pb-24'
+        currentAudio ? 'pb-48' : 'pb-24'
       } ${lang === 'my' ? 'lang-my' : ''}`}
     >
       <GlobalOfflineBanner />
@@ -290,7 +293,6 @@ const App: React.FC = () => {
 
       <UpNextCard 
         nextAudio={nextAudio}
-        onPlay={playAudio}
         currentStreak={currentStreak}
         t={t}
         lang={lang}
@@ -312,7 +314,6 @@ const App: React.FC = () => {
           </div>
           <AudioListContainer 
             audioGuides={audioGuides}
-            onPlay={playAudio}
             onToggleDone={toggleAudio}
             firstUncompletedId={firstUncompletedId}
             t={t}
@@ -425,8 +426,6 @@ const App: React.FC = () => {
       </Suspense>
 
       <StickyMiniPlayer 
-        currentlyPlayingAudio={currentlyPlayingAudio}
-        onClose={() => setCurrentlyPlayingAudio(null)}
         lang={lang}
       />
 
@@ -443,6 +442,14 @@ const App: React.FC = () => {
         <p className="text-[10px] tracking-[0.3em] font-bold text-teal-900/60 uppercase">Dhamma Lann Meditation / {new Date().getFullYear()}</p>
       </footer>
     </main>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <AudioProvider>
+      <AppContent />
+    </AudioProvider>
   );
 };
 

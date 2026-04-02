@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Info, Play, Check, FileAudio } from 'lucide-react';
 import { AudioGuide } from '../types';
+import { useAudioControls } from '../src/context/AudioContext';
 
 interface AudioCardProps {
   guide: AudioGuide;
-  onPlay: (guide: AudioGuide) => void;
   onToggleDone: (id: number) => void;
   isHighlighted: boolean;
   t: {
@@ -14,17 +14,17 @@ interface AudioCardProps {
   };
 }
 
-const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({ 
+const AudioCard = React.memo(React.forwardRef<HTMLDivElement, AudioCardProps>(({ 
   guide, 
-  onPlay, 
   onToggleDone, 
   isHighlighted,
   t 
 }, ref) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { playAudio } = useAudioControls();
 
   return (
-    <m.div 
+    <motion.div 
       ref={ref}
       className="relative flex flex-col"
       initial={{ opacity: 0, scale: 0.9 }}
@@ -34,8 +34,8 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
     >
       <div className="relative group">
         {/* Main Action: Play Audio */}
-        <m.button 
-          onClick={() => onPlay(guide)} 
+        <motion.button 
+          onClick={() => playAudio(guide)} 
           whileTap={{ scale: 0.96 }}
           className={`w-full flex flex-col items-center justify-center pt-7 pb-4 rounded-2xl transition-all border-2 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12] ${
             guide.isCompleted 
@@ -58,33 +58,33 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
           <span className="text-xs font-bold text-white/90 uppercase tracking-widest">
             {t.dayLabel} {guide.id}
           </span>
-        </m.button>
+        </motion.button>
 
         {/* Info Toggle Button */}
         {(guide.fileName || guide.date) && (
-          <m.button
+          <motion.button
             onClick={(e) => {
               e.stopPropagation();
               setIsExpanded(!isExpanded);
             }}
             whileTap={{ scale: 0.9 }}
-            className={`absolute -bottom-2 -left-2 p-2 min-w-[48px] min-h-[48px] rounded-full shadow-lg transition-all z-20 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12] ${
+            className={`absolute -bottom-2 -left-2 w-11 h-11 rounded-full shadow-lg transition-all z-20 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12] ${
               isExpanded ? 'bg-[#D4AF37] text-white' : 'bg-teal-900/80 text-white/60 hover:text-white'
             }`}
             aria-label="Toggle Info"
           >
             <Info className="w-5 h-5" />
-          </m.button>
+          </motion.button>
         )}
 
         {/* Secondary Action: Toggle Done - Redesigned for 44x44px touch target */}
-        <m.button 
+        <motion.button 
           onClick={(e) => { 
             e.stopPropagation(); 
             onToggleDone(guide.id); 
           }}
           whileTap={{ scale: 0.9 }}
-          className={`absolute -top-3 -right-3 p-2 min-w-[48px] min-h-[48px] rounded-full shadow-lg transition-all z-20 flex items-center justify-center group/toggle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12] ${
+          className={`absolute -top-3 -right-3 w-11 h-11 rounded-full shadow-lg transition-all z-20 flex items-center justify-center group/toggle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#051a12] ${
             guide.isCompleted 
               ? 'text-white' 
               : 'text-white/70 hover:text-white'
@@ -99,30 +99,30 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
           }`}>
             <AnimatePresence mode="wait">
               {guide.isCompleted ? (
-                <m.div
+                <motion.div
                   key="completed"
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 >
                   <Check className="w-4 h-4 stroke-[3]" />
-                </m.div>
+                </motion.div>
               ) : (
-                <m.span 
+                <motion.span 
                   key="id"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="text-xs font-bold"
                 >
                   {guide.id}
-                </m.span>
+                </motion.span>
               )}
             </AnimatePresence>
 
             {/* Ripple Effect when completed */}
             <AnimatePresence>
               {guide.isCompleted && (
-                <m.div
+                <motion.div
                   initial={{ scale: 0.8, opacity: 1 }}
                   animate={{ scale: 2.5, opacity: 0 }}
                   exit={{ opacity: 0 }}
@@ -132,13 +132,13 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
               )}
             </AnimatePresence>
           </div>
-        </m.button>
+        </motion.button>
       </div>
 
       {/* Inline Expansion for Info */}
       <AnimatePresence>
         {isExpanded && (
-          <m.div
+          <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -149,11 +149,11 @@ const AudioCard = React.forwardRef<HTMLDivElement, AudioCardProps>(({
               {guide.fileName && <div className="font-bold mb-1 gold-text">{guide.fileName}</div>}
               {guide.date && <div className="opacity-60">{guide.date}</div>}
             </div>
-          </m.div>
+          </motion.div>
         )}
       </AnimatePresence>
-    </m.div>
+    </motion.div>
   );
-});
+}));
 
 export default AudioCard;
