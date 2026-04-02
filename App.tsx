@@ -130,7 +130,20 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (!hasScrolled && audioGuides.length > 0 && firstUncompletedId) {
-      setHasScrolled(true);
+      // Only scroll if it's not the first day to avoid unnecessary movement on fresh start
+      if (firstUncompletedId > 1) {
+        const timer = setTimeout(() => {
+          const element = itemRefs.current.get(firstUncompletedId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setHasScrolled(true);
+          }
+        }, 600); // Slightly longer delay to ensure month expansion animation is well underway
+        return () => clearTimeout(timer);
+      } else {
+        // If it's the first day, we don't need to scroll, but we mark it as "scrolled" to prevent future checks
+        setHasScrolled(true);
+      }
     }
   }, [audioGuides, firstUncompletedId, hasScrolled]);
 
@@ -269,7 +282,7 @@ const App: React.FC = () => {
           loading="lazy"
           referrerPolicy="no-referrer"
         />
-        <h1 className={`font-bold mb-2 text-balance break-keep ${lang === 'my' ? 'text-[22px] sm:text-3xl md:text-4xl leading-[1.6]' : 'text-2xl md:text-3xl leading-tight'}`}>
+        <h1 className="font-bold mb-2 text-balance break-keep text-2xl md:text-4xl leading-tight">
           {t.titleEn}
         </h1>
         <div className="h-0.5 w-10 bg-[#B8860B] mx-auto rounded-full opacity-30" aria-hidden="true"></div>
@@ -427,7 +440,7 @@ const App: React.FC = () => {
       />
 
       <footer className="mt-12 text-center pb-8 opacity-40 border-t border-gray-200 pt-8">
-        <p className="text-[10px] tracking-[0.3em] font-bold text-teal-900/60 uppercase">Mindful Project / {new Date().getFullYear()}</p>
+        <p className="text-[10px] tracking-[0.3em] font-bold text-teal-900/60 uppercase">Dhamma Lann Meditation / {new Date().getFullYear()}</p>
       </footer>
     </main>
   );

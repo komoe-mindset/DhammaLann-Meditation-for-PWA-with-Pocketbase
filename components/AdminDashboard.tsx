@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PocketBase from 'pocketbase';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { 
   Lock, 
   Upload, 
@@ -143,7 +143,7 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   if (!isLoggedIn) {
     return (
       <div className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <motion.div 
+        <m.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="glass-card w-full max-w-md p-8 rounded-[2rem] border-2 border-[#D4AF37]/30"
@@ -198,12 +198,12 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             <button 
               type="button"
               onClick={onClose}
-              className="w-full text-white/40 text-xs font-bold uppercase tracking-widest hover:text-white/60 transition-colors pt-2"
+              className="w-full text-white/40 text-xs font-bold uppercase tracking-widest hover:text-white/60 transition-colors py-4 min-h-[48px] flex items-center justify-center"
             >
               Cancel
             </button>
           </form>
-        </motion.div>
+        </m.div>
       </div>
     );
   }
@@ -219,14 +219,14 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <div className="flex items-center gap-3">
             <button 
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/80 text-sm transition-all"
+              className="flex items-center gap-2 px-4 py-3 min-h-[48px] bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/80 text-sm transition-all"
             >
               <LogOut className="w-4 h-4" />
               Logout
             </button>
             <button 
               onClick={onClose}
-              className="px-4 py-2 bg-[#B8860B] text-white rounded-xl text-sm font-bold transition-all hover:bg-[#9a700a]"
+              className="px-4 py-3 min-h-[48px] bg-[#B8860B] text-white rounded-xl text-sm font-bold transition-all hover:bg-[#9a700a] flex items-center justify-center"
             >
               Back to App
             </button>
@@ -236,7 +236,7 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Upload Form */}
           <div className="lg:col-span-5" id="upload-form">
-            <motion.div 
+            <m.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               className="glass-card p-6 md:p-8 rounded-[2rem] border-2 border-[#D4AF37]/30 sticky top-8"
@@ -311,13 +311,13 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                         <>
                           <CheckCircle2 className="text-green-400 w-8 h-8" />
                           <span className="text-sm font-medium text-white">{audioFile.name}</span>
-                          <span className="text-[10px] uppercase">Click to change</span>
+                          <span className="text-xs uppercase">Click to change</span>
                         </>
                       ) : (
                         <>
                           <Upload className="w-8 h-8 opacity-40" />
                           <span className="text-sm font-medium">Select Audio File</span>
-                          <span className="text-[10px] uppercase">MP3, WAV, M4A</span>
+                          <span className="text-xs uppercase">MP3, WAV, M4A</span>
                         </>
                       )}
                     </label>
@@ -346,12 +346,12 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Record'}
                 </button>
               </form>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* List/Grid View */}
           <div className="lg:col-span-7">
-            <motion.div 
+            <m.div 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               className="glass-card p-6 md:p-8 rounded-[2rem] border-2 border-[#D4AF37]/10"
@@ -364,13 +364,13 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl">
                   <button 
                     onClick={() => setViewMode('grid')}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'grid' ? 'bg-[#B8860B] text-white' : 'text-white/40 hover:text-white/60'}`}
+                    className={`px-4 py-3 min-h-[48px] rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center ${viewMode === 'grid' ? 'bg-[#B8860B] text-white' : 'text-white/40 hover:text-white/60'}`}
                   >
                     Grid
                   </button>
                   <button 
                     onClick={() => setViewMode('list')}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'list' ? 'bg-[#B8860B] text-white' : 'text-white/40 hover:text-white/60'}`}
+                    className={`px-4 py-3 min-h-[48px] rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center ${viewMode === 'list' ? 'bg-[#B8860B] text-white' : 'text-white/40 hover:text-white/60'}`}
                   >
                     List
                   </button>
@@ -391,7 +391,7 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       <button
                         key={day}
                         onClick={() => handleDayClick(day, exists)}
-                        className={`aspect-square rounded-lg flex items-center justify-center text-[10px] font-bold transition-all ${
+                        className={`aspect-square rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
                           exists 
                             ? 'bg-green-500/20 text-green-400 border border-green-500/30 cursor-default' 
                             : 'bg-red-500/10 text-red-400/50 border border-red-500/20 hover:bg-red-500/20 hover:text-red-400 cursor-pointer active:scale-90'
@@ -421,7 +421,7 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                         </div>
                         <div>
                           <h3 className="text-white font-medium text-sm line-clamp-1">{record.title}</h3>
-                          <p className="text-white/40 text-[10px] uppercase tracking-wider">{record.date_string || 'No date set'}</p>
+                          <p className="text-white/40 text-xs uppercase tracking-wider">{record.date_string || 'No date set'}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -429,7 +429,7 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                           href={pb.files.getUrl(record, record.audio_file)} 
                           target="_blank" 
                           rel="noreferrer"
-                          className="p-2 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-all"
+                          className="p-2 min-w-[48px] min-h-[48px] flex items-center justify-center hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-all"
                           aria-label={`Listen to Day ${record.day_number}`}
                         >
                           <Music className="w-4 h-4" />
@@ -439,7 +439,7 @@ const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   ))}
                 </div>
               )}
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </div>
